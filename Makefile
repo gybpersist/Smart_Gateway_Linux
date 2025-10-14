@@ -33,4 +33,10 @@ app_message_test: ./test/app_message_test/app_message_test.c $(app_message) $(lo
 	./app_message_test
 	rm app_message_test
 
+# mqtt_test 测试
+mqtt_test: ./test/mqtt_test/mqtt_test.c
+	gcc -o mqtt_test $^ -lpaho-mqtt3c
+	./mqtt_test
+	rm mqtt_test
+
 
