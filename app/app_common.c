@@ -2,6 +2,7 @@
 #include <stdlib.h>   // NULL
 #include <sys/time.h> // timeval / gettimeofday()
 #include <string.h>   // strlen()
+#include <stdio.h> // sprintf()
 
 /**
  * @brief获取自1970年开始的时间戳，以ms为单位

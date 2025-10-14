@@ -24,3 +24,13 @@ app_common_test: ./test/app_common_test/app_common_test.c $(app_common) $(log)
 	gcc -o app_common_test $^ -I thirdparty -I app
 	./app_common_test
 	rm app_common_test
+
+# app_message_test 测试
+app_message := ./app/app_message.c
+json := ./thirdparty/cJSON/cJSON.c
+app_message_test: ./test/app_message_test/app_message_test.c $(app_message) $(log) $(json) $(app_common)
+	gcc -o app_message_test $^ -I thirdparty -I app
+	./app_message_test
+	rm app_message_test
+
+
