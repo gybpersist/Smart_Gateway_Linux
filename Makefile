@@ -39,4 +39,11 @@ mqtt_test: ./test/mqtt_test/mqtt_test.c
 	./mqtt_test
 	rm mqtt_test
 
+# app_mqtt_test 测试
+app_mqtt_test := ./app/app_mqtt.c
+app_mqtt_test: ./test/app_mqtt_test/app_mqtt_test.c $(app_mqtt_test) $(log)
+	gcc -o app_mqtt_test $^ -I thirdparty -I app -lpaho-mqtt3c
+	./app_mqtt_test
+	rm app_mqtt_test
+
 
