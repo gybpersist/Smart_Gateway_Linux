@@ -4,9 +4,9 @@
 // #define ADDRESS "tcp://192.168.0.10:1883"
 #define ADDRESS "tcp://broker.emqx.io:1883"
 #define CLIENTID "b253ba38-daf6-4b37-984f-5d8fdc6a1cfa"
-#define TOPIC_PULL "pull"
-#define TOPIC_PUSH "push"
-#define PAYLOAD "Hello World!"
+#define TOPIC_PULL "pull"      // 订阅的主题
+#define TOPIC_PUSH "push"      // 结束时发布的主题
+#define PAYLOAD "Hello World!" // 结束时发布的消息内容
 #define QOS 1
 #define TIMEOUT 10000L
 
