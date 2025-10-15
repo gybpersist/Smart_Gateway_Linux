@@ -39,3 +39,9 @@ mutex_lock: 07_mutex_lock.c
 	-gcc -o $@ $^
 	-./$@
 	-rm -f $@
+
+# 08_mqueue 测试
+mqueue: 08_mqueue.c
+	-gcc -o $@ $^
+	-./$@
+	-rm -f $@
