@@ -52,3 +52,11 @@ app_pool_test: ./test/app_pool_test/app_pool_test.c $(log) $(app_pool)
 	gcc -o app_pool_test $^ -I thirdparty -I app
 	./app_pool_test
 	rm app_pool_test
+
+# app_buffer_test 测试
+app_buffer := ./app/app_buffer.c
+app_buffer_test: ./test/app_buffer.test/app_buffer.test.c $(app_buffer) $(log)
+	gcc -o app_buffer_test $^ -I thirdparty -I app
+	./app_buffer_test
+	rm app_buffer_test
+
