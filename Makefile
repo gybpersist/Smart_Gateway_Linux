@@ -46,4 +46,9 @@ app_mqtt_test: ./test/app_mqtt_test/app_mqtt_test.c $(app_mqtt_test) $(log)
 	./app_mqtt_test
 	rm app_mqtt_test
 
-
+app_pool := ./app/app_pool.h app/app_pool.c
+# app_pool_test 测试
+app_pool_test: ./test/app_pool_test/app_pool_test.c $(log) $(app_pool)
+	gcc -o app_pool_test $^ -I thirdparty -I app
+	./app_pool_test
+	rm app_pool_test
