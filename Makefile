@@ -62,7 +62,8 @@ app_buffer_test: ./test/app_buffer.test/app_buffer.test.c $(app_buffer) $(log)
 
 # app_device_test 测试
 app_device:= ./app/app_device.c
-app_device_test: ./test/app_device_test/app_device_test.c $(app_device) $(log) $(app_buffer) $(app_message) $(app_common) $(json) $(app_pool) $(app_mqtt_test)
+app_bt := ./app/app_bt.c
+app_device_test: ./test/app_device_test/app_device_test.c $(app_device) $(app_bt) $(log) $(app_buffer) $(app_message) $(app_common) $(json) $(app_pool) $(app_mqtt_test)
 	-gcc $^ -o $@  -I thirdparty -I app -lpaho-mqtt3c
 	-./$@
 	-rm $@

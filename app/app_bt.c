@@ -1,0 +1,134 @@
+#include"app_bt.h"
+#include<string.h>
+#include<stdio.h>
+#include<unistd.h>
+#include"log/log.h"
+
+/**
+ * 初始化
+ * 1. 将蓝牙数据的预处理方法装配给设备模块
+ * 2 设置设备的蓝牙默认配置，并连接蓝牙
+ */
+int app_bt_init(Device *device)
+{
+    // 1. 将蓝牙数据的预处理方法装配给设备模块
+    device->pre_write = app_bt_preWrite;
+    device->post_read = app_bt_postRead;
+
+    // 2 设置设备的蓝牙默认配置，并连接蓝牙
+    return 0;
+}
+
+/**
+ * 写前预处理
+ */
+int app_bt_preWrite(char *data, int len)
+{
+    // data数据长度小于6，不合法
+    if (len < 6)
+    {
+        log_error("data长度过小,不合法");
+        return -1;
+    }
+    // 蓝牙数据的长度
+    int blue_len = 12 + data[2];
+    // 蓝牙数据缓存
+    char blue_data[blue_len];
+
+    // 依次将蓝牙数据的各部分拷贝到蓝牙数据缓存中
+    // AT+MESH（固定头部）
+    memcpy(blue_data, "AT+MESH", 8);
+    // 对端的MADDR (data中的id)
+    memcpy(blue_data + 8, data + 3, 2);
+    // 要发送的数据（不超过12字节）  就是msg
+    memcpy(blue_data + 10, data + 5, data[2]);
+    // \r\n（固定结尾）
+    memcpy(blue_data + 10 + data[2], "\r\n", 2);
+
+    // 要将data中原有的数据替换为blue_data中的数据
+    memset(data, 0, len);
+    memcpy(data, blue_data, blue_len);
+
+    // 返回蓝牙数据的长度
+    return blue_len;
+}
+
+// 缓冲区
+static char read_buf[1024];
+static int read_len = 0;
+static char fix_header[] = {0xF1, 0xDD};
+
+// 删除 read_buf 中前面指定长度数据
+static void remove_data_buff(int len)
+{
+    memmove(read_buf, read_buf + len, read_len - len);
+    read_len -= len;
+}
+
+/**
+ * 从设备读取数据后处理数据来满足网关应用的要求
+ * 接收方得到数据（3 + [2]）：f1 dd 07 23 23 ff ff 41 42 43
+ * f1 dd : 固定的头部
+ * 07：之后数据的长度（5-16之间）
+ * 23 23：对端（发送方）的 MADDR
+ * ff ff: 我的 MADDR 或 ffff(群发)
+ * 41 42 43：发送的数据
+ * 处理后的数据格式：conn_type id_len msg_len id msg
+ */
+int app_bt_postRead(char *data, int len)
+{
+    // 将 data 添加到 read_buf
+    memcpy(read_buf + read_len, data, len);
+    read_len += len;
+
+    // 如果 read_len 小于 8, 说明数据不完整，直接返回
+    if (read_len < 8)
+    {
+        return 0;
+    }
+
+    int i;
+    // 遍历缓存数据
+    for (i = 0; i < read_len - 7; i++)
+    {
+        // 如果找到 f1dd, 这一段就可能是一个完整的蓝牙数据包
+        if (memcmp(read_buf + i, fix_header, 2) == 0)
+        {
+            // 移除左侧数据
+            remove_data_buff(i);
+
+            // 如果数据长度不够，直接返回 0
+            if (read_len < read_buf[2] + 3)
+            {
+                return 0;
+            }
+
+            /*
+            f1 dd 07 23 23 ff ff 41 42 43
+            f1 dd : 固定的头部
+            07：之后数据的长度（5-16之间）
+            23 23：对端（发送方）的 MADDR
+            ff ff: 我的 MADDR 或 ffff(群发)
+            41 42 43：发送的数据
+            */
+
+            // 要生成的数据：网关中 message 的二进制数据 conn_type id_len msg_len id msg
+            memset(data, 0, len);
+            data[0] = 1;                       // conn_type
+            data[1] = 2;                       // id_len
+            data[2] = read_buf[2] - 4;         // msg_len
+            memcpy(data + 3, read_buf + 3, 2); // id
+            memcpy(data + 5, read_buf + 7, data[2]);
+
+            // 从缓存移除这段数据
+            remove_data_buff(read_buf[2] + 3);
+
+            return data[2] + 5;
+        }
+    }
+
+    // 移除 i 个无用数据
+    remove_data_buff(i);
+
+    return 0;
+}
