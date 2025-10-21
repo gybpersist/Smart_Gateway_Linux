@@ -2,3 +2,21 @@
 *.o
 *.i
 *.s
+
+# 忽略根目录下的 output.tar.gz 压缩包
+/output.tar.gz
+
+# 忽略根目录下的 output 文件夹
+/output/
+
+# 忽略根目录下的 sysroot.tar.gz 压缩包
+/sysroot.tar.gz
+
+# 忽略根目录下的 sysroot 文件夹
+/sysroot/
+
+# 忽略根目录下的 toolchain.tar.gz 压缩包
+/toolchain.tar.gz
+
+# 忽略根目录下的 toolchain 文件夹
+/toolchain/
