@@ -1,69 +1,55 @@
-# -g 开启gdb的debug调试（生成的二进制文件中包含调试信息）
-# -O0 禁用优化（确保调试一致性）
-# -Wall 显示所有警告
-CFLAGS := -g -O0 -Wall
-# $(CFLAGS) 开启gdb的debug调试（生成的二进制文件中包含调试信息）
+CC := $(CROSS_COMPILE)gcc
 
-# log_test 测试
-log := ./thirdparty/log/log.c
-log_test: ./test/log_test/log_test.c $(log)
-	gcc -o log_test $^ -I thirdparty
-	./log_test
-	rm log_test
+BOARD_DIR := $(shell pwd)/
+PEER := root@192.168.11.66
 
-# cJSON_test 测试
-cJSON := ./thirdparty/cJSON/cJSON.c
-cJSON_test: ./test/cJSON_test/cJSON_test.c $(cJSON) $(log)
-	gcc $(CFLAGS) -o cJSON_test $^ -I thirdparty
-	./cJSON_test
-	rm cJSON_test
+CFLAGS += -Wall -Wextra
+CFLAGS += -I.
+CFLAGS += -Ithirdparty
+CFLAGS += -Iapp
+CFLAGS += -Idaemon
+CFLAGS += -Iota
 
-# app_common_test 测试
-app_common := ./app/app_common.c
-app_common_test: ./test/app_common_test/app_common_test.c $(app_common) $(log)
-	gcc -o app_common_test $^ -I thirdparty -I app
-	./app_common_test
-	rm app_common_test
+ifdef SYSROOT
+CFLAGS += --sysroot=$(SYSROOT)
+endif
 
-# app_message_test 测试
-app_message := ./app/app_message.c
-json := ./thirdparty/cJSON/cJSON.c
-app_message_test: ./test/app_message_test/app_message_test.c $(app_message) $(log) $(json) $(app_common)
-	gcc -o app_message_test $^ -I thirdparty -I app
-	./app_message_test
-	rm app_message_test
+LDLIBS += -lpaho-mqtt3c
+LDLIBS += -lcurl
+LDLIBS += -lcrypto
 
-# mqtt_test 测试
-mqtt_test: ./test/mqtt_test/mqtt_test.c
-	gcc -o mqtt_test $^ -lpaho-mqtt3c
-	./mqtt_test
-	rm mqtt_test
+SRC += $(shell find app -name "*.c" -type f)
+SRC += $(shell find daemon -name "*.c" -type f)
+SRC += $(shell find ota -name "*.c" -type f)
+SRC += $(shell find thirdparty -name "*.c" -type f)
 
-# app_mqtt_test 测试
-app_mqtt_test := ./app/app_mqtt.c
-app_mqtt_test: ./test/app_mqtt_test/app_mqtt_test.c $(app_mqtt_test) $(log)
-	gcc -o app_mqtt_test $^ -I thirdparty -I app -lpaho-mqtt3c
-	./app_mqtt_test
-	rm app_mqtt_test
+OBJ := $(SRC:.c=.o)
 
-app_pool := ./app/app_pool.h app/app_pool.c
-# app_pool_test 测试
-app_pool_test: ./test/app_pool_test/app_pool_test.c $(log) $(app_pool)
-	gcc -o app_pool_test $^ -I thirdparty -I app
-	./app_pool_test
-	rm app_pool_test
+TARGET := gateway
 
-# app_buffer_test 测试
-app_buffer := ./app/app_buffer.c
-app_buffer_test: ./test/app_buffer.test/app_buffer.test.c $(app_buffer) $(log)
-	gcc -o app_buffer_test $^ -I thirdparty -I app
-	./app_buffer_test
-	rm app_buffer_test
+.PHONY: all clean cross-compile
 
-# app_device_test 测试
-app_device:= ./app/app_device.c
-app_bt := ./app/app_bt.c
-app_device_test: ./test/app_device_test/app_device_test.c $(app_device) $(app_bt) $(log) $(app_buffer) $(app_message) $(app_common) $(json) $(app_pool) $(app_mqtt_test)
-	-gcc $^ -o $@  -I thirdparty -I app -lpaho-mqtt3c
-	-./$@
-	-rm $@
+all: $(TARGET)
+
+clean:
+	@-rm -f $(TARGET) $(OBJ) main.o
+
+$(TARGET): main.o $(OBJ)
+	@-$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+
+cross-compile:
+	@CROSS_COMPILE=$(BOARD_DIR)/toolchain/bin/arm-linux-gnueabihf- \
+	SYSROOT=$(BOARD_DIR)/sysroot \
+	make -j16
+	@scp -O $(TARGET) $(PEER):/usr/bin/$(TARGET)
+
+# cross-init:
+#	@scp -O init/S99gateway $(PEER):/etc/init.d/S99gateway
+
+%.o: %.c
+	@-$(CC) $(CFLAGS) -c $^ -o $@
+
+%_test: test/%_test.o $(OBJ)
+	@-$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+	@-./$@
+	@-rm $@ $^

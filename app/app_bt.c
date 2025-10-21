@@ -6,20 +6,20 @@
 #include"log/log.h"
 #include "app_serial.h"
 
-/**
- * 初始化
- * 1. 将蓝牙数据的预处理方法装配给设备模块
- * 2 设置设备的蓝牙默认配置，并连接蓝牙
- */
-int app_bt_init(Device *device)
-{
-    // 1. 将蓝牙数据的预处理方法装配给设备模块
-    device->pre_write = app_bt_preWrite;
-    device->post_read = app_bt_postRead;
+// /**
+//  * 初始化
+//  * 1. 将蓝牙数据的预处理方法装配给设备模块
+//  * 2 设置设备的蓝牙默认配置，并连接蓝牙
+//  */
+// int app_bt_init(Device *device)
+// {
+//     // 1. 将蓝牙数据的预处理方法装配给设备模块
+//     device->pre_write = app_bt_preWrite;
+//     device->post_read = app_bt_postRead;
 
-    // 2 设置设备的蓝牙默认配置，并连接蓝牙
-    return 0;
-}
+//     // 2 设置设备的蓝牙默认配置，并连接蓝牙
+//     return 0;
+// }
 
 /**
  * 写前预处理
@@ -240,7 +240,7 @@ int app_bt_rename(Device *device, char *name)
 /**
  * 设置波特率
  */
-int app_bt_setBraudRate(Device *device, BTBraudRate baud_rate)
+int app_bt_setBaudRate(Device *device, BTBraudRate baud_rate)
 {
     char cmd[100];
     sprintf(cmd, "AT+BAUD%c\r\n", baud_rate);

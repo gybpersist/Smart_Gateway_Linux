@@ -38,7 +38,7 @@ int app_bt_rename(Device *device, char *name);
 /**
  * 设置波特率
  */
-int app_bt_setBraudRate(Device *device, BTBraudRate braud_rate);
+int app_bt_setBaudRate(Device *device, BTBraudRate braud_rate);
 
 /**
  * 重置(修改的配置才生效)
