@@ -10,7 +10,7 @@ typedef struct
 
 /**
  * @brief初始化线程池(同时创建消息队列)
- * @param size线程池大小
+ * @paramsize线程池大小
  * @return int 0:成功 -1:失败
  */
 int app_pool_init(int size);

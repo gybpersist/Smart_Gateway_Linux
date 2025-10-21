@@ -1,12 +1,11 @@
+#include "app_mqtt.h"
 #include "MQTTClient.h"
 #include "log/log.h"
 #include <string.h>
-#include "app_mqtt.h"
 
 static MQTTClient client;
 static MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 static MQTTClient_message pubmsg = MQTTClient_message_initializer;
-
 // 定义接收处理消息数据的回调函数指针
 static int (*recv_callback)(char *json) = NULL;
 
@@ -15,7 +14,6 @@ static void delivered(void *context, MQTTClient_deliveryToken dt)
 {
     log_debug("发送消息完成");
 }
-
 // 接收到远程发送过来的消息
 // 此函数比较特别：返回1代表接收处理函数成功了，返回0代表接收处理函数失败了
 static int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
@@ -38,7 +36,6 @@ static void connlost(void *context, char *cause)
 {
     log_error("连接断开，原因：%s", cause);
 }
-
 /**
  * @brief初始化mqtt客户端
  */
@@ -46,7 +43,6 @@ int app_mqtt_init()
 {
     int result;
     // 创建mqtt客户端
-
     if ((result = MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTCLIENT_SUCCESS)
     {
         log_error("MQTTClient_create failed, return code %d", result);
@@ -107,6 +103,7 @@ int app_mqtt_send(char *json)
     log_debug("向远程发送消息：%s", json);
     return 0;
 }
+
 /**
  * @brief注册接收处理接收到的消息的回调函数
  */

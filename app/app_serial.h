@@ -56,4 +56,5 @@ int app_serial_setBlock(Device *device, int is_block);
  */
 int app_serial_setRaw(Device *device);
 
+
 #endif /* __APP_SERIAL_H__ */

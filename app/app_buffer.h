@@ -2,9 +2,6 @@
 #define __APP_BUFFER_H__
 
 #include <pthread.h>
-#include "log/log.h"
-#include <string.h>
-#include <stdlib.h>
 
 // 小缓冲区
 typedef struct

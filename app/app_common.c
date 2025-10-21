@@ -1,67 +1,64 @@
 #include "app_common.h"
 #include <stdlib.h>   // NULL
-#include <sys/time.h> // timeval / gettimeofday()
-#include <string.h>   // strlen()
-#include <stdio.h> // sprintf()
+#include <sys/time.h> // timeval / gettimeofday
+#include <string.h>
+#include <stdio.h> // sprintf
 
 /**
- * @brief获取自1970年开始的时间戳，以ms为单位
- *
- * @return long 时间戳
+ * @brief 获取时间戳
  */
 long app_common_getCurrentTime(void)
 {
-    // 获取当前时间，单位为秒和微秒
+
     struct timeval tv;
+
     gettimeofday(&tv, NULL);
-    // tv_sec: 秒  tv_usec: 微秒
+
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
 /**
- * @brief 字符数组转换为十六进制字符串
- * 
- * @param chars 字符数组
- * @param chars_len 字符数组长度
+ * @brief字符数组转为对应的十六进制字符串
+ * @paramchars字符数组
+ * @paramchars_len字符数组长度
  * @return char* 转换生成的十六进制字符串
  */
 char *app_common_charsToHexstr(char *chars, int chars_len)
 {
-    // 动态申请内存
+    // 动态分配一个16进制字符串空间
     char *hex_str = (char *)malloc(chars_len * 2 + 1);
-    // 循环遍历
+    // 遍历chars字符串 拿到每一个字符 得到对应的两位十六进制字符串 并添加到hex_str中
     for (int i = 0; i < chars_len; i++)
     {
-        // 每个字节转换为2个十六进制字符
-        sprintf(hex_str + i * 2, "%02x", chars[i]);
+        sprintf(hex_str + i * 2, "%02X", chars[i]);
     }
-    // 字符串结尾
+    // 在hex_str的末尾添加字符串结束符
     hex_str[chars_len * 2] = '\0';
 
     return hex_str;
 }
 
 /**
- * @brief 十六进制字符串转换为对应的字符数组
- * 
- * @param hex_str 十六进制字符串
- * @param chars_len 接收字符数组长度的指针
- * @return char* 转换生生成的字符数组
+ * @brief十六进制字符串转为对应的字符数组
+ * @paramhex_str十六进制字符串
+ * @paramchars_len接收生成的字符数组长度的指针
+ * @return char* 转换生成的字符数组
  */
 char *app_common_hexstrToChars(char *hex_str, int *chars_len)
 {
-    // 计算16进制字符串的长度
-    int hex_str_len = strlen((const char *)hex_str);
-    // 计算转换后的字符串的长度
+    // 获取hex_str的长度
+    int hex_str_len = strlen(hex_str);
+    // 计算最终生成字符串的长度
     *chars_len = hex_str_len / 2;
-    // 动态申请内存
-    char *chars_str = (char *)malloc(*chars_len);
-    // 循环遍历
+    // 动态分配一个字符数组空间
+    char *chars = (char *)malloc(*chars_len + 1);
+    // 遍历hex_str字符串 每两个十六进制字符转换为一个字符 并添加到chars中
     for (int i = 0; i < hex_str_len; i += 2)
     {
-        // 每个十六进制字符转换为1个字节
-        sscanf(hex_str + i, "%02x", (unsigned int *)(chars_str + i / 2));
+        sscanf(hex_str + i, "%02X", (unsigned int *)(chars + i / 2));
     }
+    //给chars添加字符串结束符
+    chars[*chars_len] = '\0';
 
-    return chars_str;
+    return chars;
 }
