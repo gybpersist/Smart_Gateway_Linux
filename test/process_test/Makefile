@@ -13,3 +13,15 @@ execve: 02_execve.c other
 	-gcc $< -o $@
 	-./$@
 	-rm $@ $(word 2, $^)
+
+# 03_waitpid 测试
+waitpid: 03_waitpid.c
+	gcc -o waitpid 03_waitpid.c
+	./waitpid
+	rm -f waitpid
+
+# 04_signal 测试
+signal: 04_signal.c
+	gcc -o signal 04_signal.c
+	./signal
+	rm -f signal
