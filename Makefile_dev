@@ -67,3 +67,15 @@ app_device_test: ./test/app_device_test/app_device_test.c $(app_device) $(app_bt
 	-gcc $^ -o $@  -I thirdparty -I app -lpaho-mqtt3c
 	-./$@
 	-rm $@
+
+ota_http := ./ota/ota_http.c
+ota_http_test: ./test/ota_http_test/ota_http_test.c $(ota_http) $(log)
+	-gcc  $^ -o $@ -I app -Iota -I thirdparty  -lcurl
+	-./$@
+	-rm $@
+
+ota_version:= ./ota/ota_version.c
+ota_version_test: ./test/ota_version_test/ota_version_test.c $(ota_version) $(cJSON) $(ota_http) $(log)
+	-gcc $^ -o $@ -Iapp -Iota -I thirdparty -lcurl -lcrypto
+	-./$@
+	-rm $@

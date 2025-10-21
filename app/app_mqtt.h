@@ -1,9 +1,8 @@
 #ifndef __APP_MQTT_H__
 #define __APP_MQTT_H__
 
-// #define ADDRESS "tcp://192.168.11.57:1883"
 #define ADDRESS "ws://192.168.11.57:1883"
-#define CLIENTID "b253ba38-daf6-4b37-984f-5d8fdc6a1cfa"
+#define CLIENTID "b253ba38-daf6-4b37-984f-5d8fdc6a1afa"
 #define TOPIC_PULL "pull"
 #define TOPIC_PUSH "push"
 #define PAYLOAD "Hello World!"
